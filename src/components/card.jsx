@@ -47,7 +47,12 @@ const deck = [
 export default class Card extends Component {
     render()
     {
-        let cssclass = this.props.rotate < 0 ? 'cardRotate' : ''; 
+        let cssclass = 'card';
+        
+        if(this.props.battle) 
+            cssclass += ' cardBattle';
+        else if(this.props.rotate < 0) 
+            cssclass+= ' cardRotate'; 
 
         return <div>
             <img src={deck[this.props.id]} onClick={this.props.onClick} className={cssclass}/>
