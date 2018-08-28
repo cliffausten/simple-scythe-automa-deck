@@ -6,3 +6,12 @@
     -webkit-transform:  rotate(180deg);
     -o-transform:       rotate(180deg);
 }
+
+.cardBattle 
+{
+    transform:          rotate(270deg);
+    -ms-transform:      rotate(270deg);
+    -moz-transform:     rotate(270deg);
+    -webkit-transform:  rotate(270deg);
+    -o-transform:       rotate(270deg);
+}

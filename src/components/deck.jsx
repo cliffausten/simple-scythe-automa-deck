@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import Card from './card';
+import Button from '@material-ui/core/Button';
 
-const deck = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]  ;
+const deck = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19] ;
 
 export default class Deck extends Component {
     constructor()
@@ -10,7 +11,8 @@ export default class Deck extends Component {
         this.state = {
             id : 0,
             shuffledDeck : this.shuffle(deck),
-            rotate: 1
+            rotate: 1,
+            battle: false
         }
     }
 
@@ -18,9 +20,10 @@ export default class Deck extends Component {
     {
         return (
             <div>
-                <Card id={this.state.id} rotate={this.state.rotate} onClick={() => this.onCardClick()}/>
+                <Card id={this.state.id} rotate={this.state.rotate} battle={this.state.battle} onClick={() => this.onCardClick()}/>
                 <div>   
-                    <button onClick={() => this.onRotateClick()}>Rotate</button>        
+                    <Button variant="contatined" color="primary" onClick={() => this.onRotateClick()}>Rotate</Button>
+                    <Button variant="contatined" color="primary" onClick={() => this.onBattleClick()}>Battle</Button>                
                 </div>
             </div>
         );
