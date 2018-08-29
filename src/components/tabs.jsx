@@ -63,9 +63,9 @@ export default class DeckTabs extends Component {
                     <Deck id={currentDeck.id} rotate={currentDeck.rotate} battle={currentDeck.battle} 
                         onCardClick={() => this.onCardClick()}/>
                     <footer className="buttons">   
-                        <Button variant="contained" color="primary" onClick={() => this.onRotateClick()}>Rotate</Button>
-                        <Button variant="contained" color="primary" onClick={() => this.onBattleClick()}>Battle</Button>                
-                        <Button variant="contained" color="primary" onClick={() => this.onCardsClick()}>Cards</Button>                
+                        <Button variant="contained" color="primary" disabled={currentDeck.battle} onClick={() => this.onRotateClick()}>Rotate</Button>
+                        <Button variant="contained" color="primary" disabled={currentDeck.battle} onClick={() => this.onBattleClick()}>Battle</Button>                
+                        <Button variant="contained" color="primary" disabled={currentDeck.battle} onClick={() => this.onCardsClick()}>Cards</Button>                
                     </footer>  
                 </div>      
                 <Dialog
@@ -86,7 +86,8 @@ export default class DeckTabs extends Component {
 
         currentDeck.deck = newdeck;
         currentDeck.shuffledDeck = this.shuffle(currentDeck.deck);
-        
+        currentDeck.id = 0;
+
         this.setState({
             cardSelection: false,
             decks: update(this.state.decks, {
