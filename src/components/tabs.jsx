@@ -1,7 +1,10 @@
 import React, {Component} from 'react';
 import update from 'immutability-helper';
+import Dialog from '@material-ui/core/Dialog';
 
+import CardSelection from './cardselection';
 import Deck from './deck';
+import '../css/tabs.css'
 
 
 
@@ -10,8 +13,13 @@ import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Button from '@material-ui/core/Button';
+import Slide from '@material-ui/core/Slide';
 
-const deck = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19] ;
+const coreDeck = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19];
+
+function Transition(props) {
+    return <Slide direction="up" {...props} />;
+  }
 
 export default class DeckTabs extends Component {
     constructor(){
@@ -23,11 +31,13 @@ export default class DeckTabs extends Component {
             decks: [
                 {                
                     id : 0,
-                    shuffledDeck : this.shuffle(deck),
+                    deck: coreDeck.slice(0,coreDeck.length),
+                    shuffledDeck : this.shuffle(coreDeck),
                     rotate: 1,
                     battle: false             
                 }
-            ]
+            ],
+            cardSelection: false
         }
     }
 
@@ -38,36 +48,62 @@ export default class DeckTabs extends Component {
         let tabs = [];
 
         for(let i = 0; i < this.state.numberOfTabs;i++)
-            tabs.push(<Tab label={"Automa " + (i+1)}/>);
+            tabs.push(<Tab key={i} label={"Automa " + (i+1)}/>);
 
-        tabs.push(<Tab label="+"/>);    
+        tabs.push(<Tab key={this.state.numberOfTabs} label="+"/>);    
 
         return ( 
-            <div >
-            <AppBar position="static">
-                <Tabs value={this.state.currentTab} onChange={(event,value) => this.handleChange(event,value)}>
-                    {tabs}
-                </Tabs>
-            </AppBar>
-            <Deck id={currentDeck.id} rotate={currentDeck.rotate} battle={currentDeck.battle} 
-                onCardClick={() => this.onCardClick()}/>
-            <div>   
-                <Button variant="contatined" color="primary" onClick={() => this.onRotateClick()}>Rotate</Button>
-                <Button variant="contatined" color="primary" onClick={() => this.onBattleClick()}>Battle</Button>                
-                <Button variant="contatined" color="primary" onClick={() => this.onCardsClick()}>Cards</Button>                
-            </div>         
-        </div>
+            <div className="page">            
+                <div className="template">
+                    <AppBar position="static">
+                        <Tabs value={this.state.currentTab} onChange={(event,value) => this.handleChange(event,value)}>
+                            {tabs}
+                        </Tabs>
+                    </AppBar>
+                    <Deck id={currentDeck.id} rotate={currentDeck.rotate} battle={currentDeck.battle} 
+                        onCardClick={() => this.onCardClick()}/>
+                    <footer className="buttons">   
+                        <Button variant="contained" color="primary" onClick={() => this.onRotateClick()}>Rotate</Button>
+                        <Button variant="contained" color="primary" onClick={() => this.onBattleClick()}>Battle</Button>                
+                        <Button variant="contained" color="primary" onClick={() => this.onCardsClick()}>Cards</Button>                
+                    </footer>  
+                </div>      
+                <Dialog
+                    fullScreen
+                    open={this.state.cardSelection}            
+                    TransitionComponent={Transition}
+                >
+                    <CardSelection deck={coreDeck} onClose={(deck)=>this.handleClose(deck)}/>
+                </Dialog>
+            </div>
         );
+    }
+
+    handleClose(newdeck)
+    {
+
+        let currentDeck = this.state.decks[this.state.currentTab];
+
+        currentDeck.deck = newdeck;
+        currentDeck.shuffledDeck = this.shuffle(currentDeck.deck);
+        
+        this.setState({
+            cardSelection: false,
+            decks: update(this.state.decks, {
+                [this.state.currentTab]: {$set : currentDeck }                    
+            })
+        })
     }
 
     handleChange(event, value)
     {   
-        if(value == this.state.numberOfTabs)
+        if(value === this.state.numberOfTabs)
         {
             let newDeck = [
                 {                
                     id : 0,
-                    shuffledDeck : this.shuffle(deck),
+                    deck: coreDeck.slice(0,coreDeck.length),
+                    shuffledDeck : this.shuffle(coreDeck),
                     rotate: 1,
                     battle: false             
                 }
@@ -95,6 +131,8 @@ export default class DeckTabs extends Component {
         let currentDeck = this.state.decks[this.state.currentTab];
 
         currentDeck.rotate = currentDeck.rotate * -1;
+        currentDeck.id = 0;
+        currentDeck.shuffledDeck = this.shuffle(currentDeck.deck);
         
         this.setState(
             {
@@ -134,7 +172,9 @@ export default class DeckTabs extends Component {
 
     onCardsClick()
     {
-
+        this.setState({
+            cardSelection: true 
+        })
     }
 
     onCardClick()
@@ -151,10 +191,13 @@ export default class DeckTabs extends Component {
         }
         else {            
             let shuffledDeck = currentDeck.shuffledDeck;
-            let card = 0;
+            let card = 0;            
 
             if(shuffledDeck.length > 0)
                 card = shuffledDeck.pop();
+            else {
+                shuffledDeck = this.shuffle(currentDeck.deck);                                
+            }
 
             currentDeck.id = card;
             currentDeck.shuffledDeck = shuffledDeck;        
@@ -173,7 +216,9 @@ export default class DeckTabs extends Component {
         return Math.floor(Math.random() * Math.floor(max));
     }
 
-    shuffle(array) {
+    shuffle(orginalarray) {
+        let array = orginalarray.slice(0,orginalarray.length);
+
         var currentIndex = array.length, temporaryValue, randomIndex;
       
         // While there remain elements to shuffle...
