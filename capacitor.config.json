@@ -1,0 +1,6 @@
+{
+  "appId": "uk.co.royalsalamander.automadeckander",
+  "appName": "automadeck",
+  "webDir": "build",
+  "bundledWebRuntime": false
+}
